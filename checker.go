@@ -5,14 +5,14 @@ import (
 	"errors"
 )
 
-type DupCheckers[T comparable] map[T]struct{}
+type DupChecker[T comparable] map[T]struct{}
 
-func New[T comparable](count int) *DupCheckers[T] {
+func New[T comparable](count int) *DupChecker[T] {
 	m := make(map[T]struct{}, count)
-	return (*DupCheckers[T])(&m)
+	return (*DupChecker[T])(&m)
 }
 
-func (C *DupCheckers[T]) add(t T) error {
+func (C *DupChecker[T]) add(t T) error {
 	if _, ok := (*C)[t]; !ok {
 		(*C)[t] = struct{}{}
 		return nil
@@ -21,11 +21,11 @@ func (C *DupCheckers[T]) add(t T) error {
 	}
 }
 
-func (C *DupCheckers[T]) size() int {
+func (C *DupChecker[T]) size() int {
 	return len(*C)
 }
 
-func (C *DupCheckers[T]) fromSlice(t []T) bool {
+func (C *DupChecker[T]) fromSlice(t []T) bool {
 	for _, v := range t {
 		if err := C.add(v); err == nil {
 			continue
@@ -36,7 +36,7 @@ func (C *DupCheckers[T]) fromSlice(t []T) bool {
 	return false
 }
 
-func (C *DupCheckers[T]) fromChannel(ctx context.Context, c chan T) (bool, error) {
+func (C *DupChecker[T]) fromChannel(ctx context.Context, c chan T) (bool, error) {
 	for {
 		select {
 		case <-ctx.Done():
